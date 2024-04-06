@@ -1,4 +1,6 @@
-oSoWoSo
+![oSoWoSo](profile/logo.svg)
+
+# oSoWoSo
 ---
 
 Our world is in our hands...
