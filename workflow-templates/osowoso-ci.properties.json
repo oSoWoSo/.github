@@ -1,7 +1,7 @@
 {
     "name": "oSoWoSo Workflow",
     "description": "oSoWoSo CI starter workflow.",
-    "iconName": "https://github.com/oSoWoSo/.github/blob/1e4150a9f9a1ddcccd9d19535802a0f49ba79354/profile/logo.svg",
+    "iconName": "logo",
     "categories": [
         "Go"
     ],
