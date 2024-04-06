@@ -1,9 +1,8 @@
 {
     "name": "oSoWoSo Workflow",
     "description": "oSoWoSo CI starter workflow.",
-    "iconName": "logo",
     "categories": [
-        "Go"
+        "base"
     ],
     "filePatterns": [
         "package.json$",
