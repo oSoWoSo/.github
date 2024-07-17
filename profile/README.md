@@ -83,4 +83,4 @@ https://simplex.chat/contact#/?v=2-5&smp=smp%3A%2F%2Fu2dS9sG8nMNURyZwqASV4yROM28
 ---
 open Source World Society
 
-osowoso.org
+https://osowoso.org
