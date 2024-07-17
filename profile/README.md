@@ -12,8 +12,6 @@ anyone can contribute their peace of puzzle
 final goal
 # open Source World Society
 
-![oSoWoSo](profile/logo.svg)
-
 Anyone willing participate will be invited...
 
 Only requirements is contributing to open source
