@@ -31,3 +31,16 @@ favicon: logo.svg
 #header-colours: 
 #  right: "#8a108c"
 #  left: "#cc580c"
+
+menu:
+  - title: Home
+    url: /
+  - title: About
+    url: https://about.osowoso.org
+  - title: Contact
+    url: https://contact.osowoso.org
+  - title: SimpleX Chat themes
+    url: https://themes.osowoso.org
+  - title: DistroHopper
+    url: https://dh.osowoso.org
+
