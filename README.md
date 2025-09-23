@@ -82,3 +82,5 @@ Link to join the oSoWoSo group on SimpleX chat:
 open Source World Society
 
 [oSoWoSo](https://osowoso.org)
+
+We got a :star: from [@epoberezkin](https://github.com/epoberezkin)
