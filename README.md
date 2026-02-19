@@ -23,7 +23,7 @@ Our little open source crossroad site
 
 # OPEN SOURCE RULES - from us for us
 
-Purpose of this project is not create some rules for you, is it promote open source ideas everywhere is possible.
+Purpose of this project is not create some rules for you, is it promote open source ideas everywhere possible.
 
 # Even in rule making.
 
