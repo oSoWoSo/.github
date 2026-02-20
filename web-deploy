@@ -1,0 +1,149 @@
+#!/usr/bin/env bash
+#
+# deploy — copy template and push repos
+#
+# Author: zenobit <zen@duck.com>
+# License: MIT
+#
+
+# Source shared functions
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib.sh
+source "${SCRIPT_DIR}/lib.sh"
+
+# Load .env
+if [ -f "${SCRIPT_DIR}/.env" ]; then
+	source "${SCRIPT_DIR}/.env"
+	_g 'Using .env'
+else
+	_re '.env not found — LIST is required'
+fi
+
+# Validate LIST
+[ ${#LIST[@]} -eq 0 ] && _re 'LIST is empty — define it in .env'
+
+_remove_deprecated() {
+	local d
+	d="$1"
+	if [ -f "$d/create" ]; then
+		rm -f "$d/create" && _b "Deprecated $d/create script removed!"
+	fi
+	if [ -f "$d/create-web" ]; then
+		rm -f "$d/create-web" && _b "Deprecated $d/create-web script removed!"
+	fi
+}
+
+_copy() {
+	for d in "${LIST[@]}"; do
+		name=$(basename "$d")
+		_g "Updating $name website"
+		mkdir -p "$d/src"
+		if [ "$d" = "$DIR/dh" ]; then
+			_remove_deprecated "$d"
+			cp -v lib.sh "$d/"
+			cp -v web-create "$d/"
+			cp -v web-deploy "$d/"
+			cp -rv .github "$d/"
+			for f in src/*; do
+				if [ ! "$f" = "src/favicon.ico" ]; then
+					cp "$f" "$d/src/"
+				fi
+			done
+		else
+			cp -rv .github lib.sh web-create web-deploy src "$d/"
+			#chmod a+x "$d/web-create" "$d/web-deploy"
+		fi
+	done
+}
+
+_push_template() {
+	_g "Pushing template..."
+	git push origin
+}
+
+_build_repos() {
+	for d in "${LIST[@]}"; do
+		[ -f "$d/web-create" ] || continue
+		_g "Building: $d"
+		(cd "$d" && ./web-create -b) || _y "Build failed: $d"
+	done
+}
+
+_push_repos() {
+	local msg
+	msg=$(_input "Commit message...")
+	[ -z "$msg" ] && _g "No message, skipping push" && return
+
+	for d in "${LIST[@]}"; do
+		[ -d "$d/.git" ] || continue
+		_g "Pushing: $d"
+		git -C "$d" add -A
+		git -C "$d" commit -m "$msg" || _y "Nothing to commit in $d"
+		git -C "$d" push origin || _y "Push failed: $d"
+	done
+}
+
+_release_template() {
+	if ! command -v gh &>/dev/null; then
+		_re "gh CLI not found — install it first"
+	fi
+
+	local version
+	version=$(_input "Release version (e.g. v1.0.0)...")
+	[ -z "$version" ] && _g "No version, skipping release" && return
+
+	local notes
+	notes=$(_write "Release notes (optional)...")
+
+	if gh release create "$version" --title "$version" --notes "$notes"; then
+		_g "Release $version created"
+	else
+		_re "Release failed"
+	fi
+}
+
+confirmMessage="Copy template to:
+$(printf '  %s\n' "${LIST[@]}")
+continue?"
+
+# Menu
+ACTION=$(_choose \
+	"Copy template to repos" \
+	"Build all repos" \
+	"Push template (origin)" \
+	"Push repos from LIST" \
+	"Create release (template)" \
+	"All (copy + build + push template + push repos)")
+
+case "$ACTION" in
+	"Copy template to repos")
+		_confirm "$confirmMessage" && _copy
+		;;
+	"Push template (origin)")
+		_confirm "Push template to origin?" && _push_template
+		;;
+	"Push repos from LIST")
+		_confirm "Commit and push all repos in LIST?" && _push_repos
+		;;
+	"Create release (template)")
+		_release_template
+		;;
+	"All (copy + push template + push repos)")
+		_confirm "Run all steps?" && {
+			_copy
+			_push_template
+			_push_repos
+		}
+		;;
+	"Build all repos")
+		_confirm "Build all repos in LIST?" && _build_repos
+		;;
+	"All (copy + build + push template + push repos)")
+		_confirm "Run all steps?" && {
+			_copy
+			_build_repos
+			_push_template
+			_push_repos
+		}
+		;;
+esac
